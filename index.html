@@ -1,0 +1,1190 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>منصّة الكيمياء 2-2 التفاعلية</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root{
+      /* ألوان علمية (حسب طلبك) */
+      --p1:#33618C;  /* أزرق */
+      --p2:#4B8B67;  /* أخضر */
+      --p3:#CF883D;  /* برتقالي/ذهبي */
+      --bg:#F8F9FA;  /* خلفية فاتحة */
+
+      --ink:#1f2a37;
+      --muted:#6b7280;
+      --card:rgba(255,255,255,.88);
+      --stroke:rgba(31,42,55,.08);
+      --shadow: 0 18px 55px rgba(31,42,55,.12);
+      --radius: 22px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Tajawal", system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--ink);
+      background:
+        radial-gradient(1100px 700px at 12% 10%, rgba(51,97,140,.18), transparent 60%),
+        radial-gradient(900px 650px at 92% 18%, rgba(75,139,103,.16), transparent 55%),
+        radial-gradient(850px 650px at 45% 92%, rgba(207,136,61,.14), transparent 55%),
+        linear-gradient(135deg, #ffffff, var(--bg));
+      min-height:100vh;
+      background-size: 200% 200%, 180% 180%, 180% 180%, 100% 100%;
+      animation: bgFlow 14s ease-in-out infinite;
+    }
+    @keyframes bgFlow {
+      0% { background-position: 0% 50%, 100% 20%, 40% 90%, 0% 0%; }
+      50%{ background-position: 100% 50%, 0% 20%, 60% 80%, 100% 100%; }
+      100%{ background-position: 0% 50%, 100% 20%, 40% 90%, 0% 0%; }
+    }
+
+    .wrap{max-width:1120px;margin:0 auto;padding:18px 14px 90px}
+    header{
+      display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;
+      padding:16px 16px 12px;
+      background:var(--card);border:1px solid rgba(255,255,255,.9);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+    .brand h1{margin:0;font-size:20px;font-weight:900}
+    .brand p{margin:6px 0 0;color:var(--muted);font-size:13px;font-weight:800}
+
+    .pill{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .badge{
+      padding:8px 12px;border-radius:999px;font-size:13px;font-weight:900;
+      border:1px solid rgba(255,255,255,.75);
+      background:linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.60));
+    }
+    .badge b{color:var(--p1)}
+
+    .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+    button{
+      border:0;cursor:pointer;
+      padding:10px 14px;border-radius:14px;
+      font-weight:900;
+      background:linear-gradient(135deg, var(--p2), var(--p1));
+      color:white;
+      box-shadow:0 10px 25px rgba(51,97,140,.18);
+      transition:transform .08s ease, filter .12s ease;
+    }
+    button:active{transform:translateY(1px) scale(.99)}
+    .ghost{
+      background:linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.65));
+      color:var(--ink);
+      border:1px solid rgba(255,255,255,.95);
+      box-shadow:none;
+    }
+
+    /* حقول الهوية */
+    .identity{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .identity .field{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:14px;
+      background:rgba(255,255,255,.90);
+      border:1px solid var(--stroke);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+    }
+    .identity label{
+      font-weight:950;
+      font-size:13px;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .identity input{
+      border:0;
+      outline:0;
+      background:transparent;
+      font-family:inherit;
+      font-weight:950;
+      font-size:14px;
+      min-width:140px;
+      color:var(--ink);
+    }
+    .identity input::placeholder{
+      color:#9ca3af;
+      font-weight:800;
+    }
+
+    main{margin-top:14px;display:grid;gap:14px}
+    .pageCard{
+      background:var(--card);
+      border:1px solid rgba(255,255,255,.9);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter: blur(10px);
+      padding:14px;
+    }
+    .topbar{
+      display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;
+      margin-bottom:10px;
+    }
+    .crumb{color:var(--muted);font-weight:950}
+    .nav{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .nav .mini{padding:8px 12px;border-radius:14px;font-weight:900}
+
+    .intro{
+      display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;
+      margin-bottom:10px;
+    }
+    .intro h2{margin:0;font-size:18px;font-weight:950}
+    .intro small{color:var(--muted);font-weight:850}
+
+    .progress{
+      display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+      color:var(--muted);font-weight:950;
+    }
+    .bar{
+      width:200px;height:10px;border-radius:999px;background:rgba(31,42,55,.08);overflow:hidden;
+    }
+    .bar > i{
+      display:block;height:100%;width:0%;
+      background:linear-gradient(90deg, var(--p2), var(--p1), var(--p3));
+      border-radius:999px;
+    }
+
+    .timerPill{
+      padding:8px 12px;border-radius:999px;
+      background:rgba(255,255,255,.90);
+      border:1px solid var(--stroke);
+      font-weight:950;color:var(--muted);
+      display:flex;gap:8px;align-items:center;
+    }
+    .timerPill b{color:var(--p1)}
+    .timerPill.danger{
+      border-color: rgba(207,136,61,.35);
+      background: linear-gradient(135deg, rgba(207,136,61,.10), rgba(255,255,255,.88));
+    }
+    .timerPill.ok{
+      border-color: rgba(75,139,103,.35);
+      background: linear-gradient(135deg, rgba(75,139,103,.10), rgba(255,255,255,.88));
+    }
+
+    /* لوحة المطابقة */
+    .board{display:grid;gap:12px;grid-template-columns: 1fr;}
+    @media (min-width: 860px){ .board{grid-template-columns: 1fr 1fr;} }
+
+    .col{
+      background:rgba(255,255,255,.90);
+      border:1px solid var(--stroke);
+      border-radius:18px;
+      padding:12px;
+    }
+    .col h3{
+      margin:0 0 10px;
+      font-size:15px;font-weight:950;
+      display:flex;justify-content:space-between;align-items:center;
+    }
+    .col h3 span{font-size:12px;color:var(--muted);font-weight:900}
+
+    .list{display:grid;gap:10px}
+    .item{
+      padding:12px 12px;border-radius:16px;
+      border:1px solid rgba(31,42,55,.10);
+      background:linear-gradient(135deg, rgba(51,97,140,.08), rgba(75,139,103,.06));
+      font-weight:950;
+      cursor:pointer;
+      user-select:none;
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      transition:transform .08s ease, filter .12s ease;
+    }
+    .item:active{transform:translateY(1px)}
+    .item small{color:var(--muted);font-weight:900}
+    .item.selected{
+      outline:3px solid rgba(75,139,103,.45);
+      background:linear-gradient(135deg, rgba(75,139,103,.16), rgba(255,255,255,.92));
+    }
+    .item.matched{
+      cursor:default;
+      opacity:.78;
+      background:linear-gradient(135deg, rgba(75,139,103,.16), rgba(255,255,255,.92));
+      border-color: rgba(75,139,103,.55);
+    }
+    .item.wrong{
+      animation: shake .22s ease-in-out 0s 1;
+      outline:3px solid rgba(207,136,61,.45);
+      background:linear-gradient(135deg, rgba(207,136,61,.14), rgba(255,255,255,.92));
+    }
+    @keyframes shake{
+      0%{transform:translateX(0)}
+      25%{transform:translateX(6px)}
+      50%{transform:translateX(-6px)}
+      75%{transform:translateX(4px)}
+      100%{transform:translateX(0)}
+    }
+
+    .hint{
+      margin-top:10px;
+      color:var(--muted);
+      font-weight:900;
+      line-height:1.8;
+    }
+
+    .footerRow{
+      margin-top:12px;
+      display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;
+    }
+    .chips{display:flex;gap:8px;flex-wrap:wrap}
+    .chip{
+      padding:8px 12px;border-radius:999px;
+      background:rgba(255,255,255,.88);
+      border:1px solid var(--stroke);
+      font-weight:950;
+      color:var(--muted);
+    }
+
+    .pages{display:none;}
+    .pages.active{display:block}
+
+    /* Toast */
+    .toast{
+      position:fixed;
+      left:16px;
+      bottom:16px;
+      z-index:9999;
+      max-width:min(420px, calc(100vw - 32px));
+      background: linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.72));
+      border:1px solid rgba(255,255,255,.95);
+      box-shadow:0 18px 55px rgba(31,42,55,.14);
+      border-radius:18px;
+      padding:12px 14px;
+      font-weight:950;
+      display:none;
+      backdrop-filter: blur(10px);
+    }
+    .toast.show{display:block; animation: pop .18s ease-out;}
+    @keyframes pop{from{transform:translateY(10px);opacity:.0}to{transform:translateY(0);opacity:1}}
+
+    /* Reward Overlay */
+    .rewardOverlay{
+      position:fixed; inset:0;
+      background:rgba(17,24,39,.42);
+      z-index:9998;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+    }
+    .rewardOverlay.show{display:flex}
+    .rewardCard{
+      position:relative;
+      overflow:hidden;
+      width:min(560px, 96vw);
+      background:linear-gradient(135deg, rgba(255,255,255,.94), rgba(255,255,255,.78));
+      border:1px solid rgba(255,255,255,.92);
+      box-shadow:0 22px 70px rgba(31,42,55,.22);
+      border-radius:24px;
+      padding:16px;
+      backdrop-filter: blur(12px);
+      text-align:center;
+    }
+    .rewardCard::before{
+      content:"";
+      position:absolute;
+      inset:-60px;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(51,97,140,.18), transparent 45%),
+        radial-gradient(circle at 80% 30%, rgba(75,139,103,.16), transparent 45%),
+        radial-gradient(circle at 50% 80%, rgba(207,136,61,.14), transparent 50%);
+      filter: blur(2px);
+      opacity:.95;
+      pointer-events:none;
+    }
+    .rewardCard::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(135deg, rgba(255,255,255,.35), rgba(255,255,255,0));
+      pointer-events:none;
+    }
+    .rewardTitle{
+      margin:0;
+      font-size:20px;
+      font-weight:980;
+      letter-spacing:.2px;
+      position:relative;
+      z-index:1;
+    }
+    .rewardMedal{
+      font-size:64px;
+      margin:10px 0 6px;
+      filter: drop-shadow(0 10px 22px rgba(51,97,140,.18));
+      position:relative;
+      z-index:1;
+      animation: crownBounce .9s ease-in-out infinite;
+    }
+    @keyframes crownBounce{
+      0%,100%{ transform: translateY(0) rotate(-2deg); }
+      50%{ transform: translateY(-6px) rotate(2deg); }
+    }
+    .rewardText{
+      margin:0;
+      color:var(--muted);
+      font-weight:900;
+      line-height:1.85;
+      position:relative;
+      z-index:1;
+    }
+    .rewardRow{
+      margin-top:12px;
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      flex-wrap:wrap;
+      position:relative;
+      z-index:1;
+    }
+    #rewardNext{
+      box-shadow: 0 12px 28px rgba(207,136,61,.20);
+    }
+
+    /* Sparkles */
+    .sparkles{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      z-index:0;
+    }
+    .sparkles i{
+      position:absolute;
+      width:10px;height:10px;
+      background: radial-gradient(circle, rgba(255,255,255,.95), rgba(255,255,255,0) 70%);
+      border-radius:50%;
+      opacity:.0;
+      animation: twinkle 1.8s ease-in-out infinite;
+    }
+    @keyframes twinkle{
+      0%{ transform: scale(.6); opacity:0; }
+      35%{ opacity:.95; }
+      70%{ transform: scale(1.35); opacity:.2; }
+      100%{ opacity:0; }
+    }
+
+    /* Trophy ribbon tags */
+    .trophyRibbon{
+      display:flex;
+      justify-content:center;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .trophyRibbon .tag{
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.88);
+      border:1px solid var(--stroke);
+      font-weight:950;
+      color:var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <h1>منصّة الكيمياء 2-2 التفاعلية</h1>
+        <p>تعلّم – طبّق – فرّق • لعبة مطابقة بالنقر (Tap-to-Match)</p>
+      </div>
+
+      <div class="identity">
+        <div class="field">
+          <label>🏫 المدرسة</label>
+          <input id="schoolName" type="text" placeholder="اسم المدرسة">
+        </div>
+        <div class="field">
+          <label>✏️ المعلمة</label>
+          <input id="teacherName" type="text" placeholder="اسم المعلمة">
+        </div>
+        <div class="field">
+          <label>🏫 المديرة</label>
+          <input id="principalName" type="text" placeholder="اسم مديرة المدرسة">
+        </div>
+      </div>
+
+      <div class="pill">
+        <div class="badge">النقاط: <b id="score">0</b> ⭐</div>
+        <div class="badge">سلسلة نجاح: <b id="streak">0</b> 🔥</div>
+      </div>
+
+      <div class="actions">
+        <button class="ghost" id="toggleSound">🔊 الصوت: تشغيل</button>
+        <button class="ghost" id="resetAll">إعادة ضبط</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- Navigation -->
+      <section class="pageCard">
+        <div class="topbar">
+          <div class="crumb" id="pageCrumb">الفصل 1/4 — الطاقة والتغيرات الكيميائية</div>
+          <div class="nav">
+            <button class="ghost mini" id="prevPage">◀ السابق</button>
+            <button class="ghost mini" id="nextPage">التالي ▶</button>
+          </div>
+        </div>
+
+        <div id="pagesHost"></div>
+      </section>
+
+      <section class="pageCard">
+        <div class="hint">
+          ✅ طريقة اللعب: اضغط/ي مفهومًا من اليمين ثم اضغط/ي تعريفه من اليسار.  
+          عند الإجابة الصحيحة: 🎉 + 👏  
+          عند الخطأ: اهتزاز خفيف + تنبيه.
+        </div>
+        <div class="footerRow">
+          <div class="chips">
+            <div class="chip">مناسب للجوال</div>
+            <div class="chip">بدون سحب</div>
+            <div class="chip">نتيجة فورية</div>
+          </div>
+          <div class="chips">
+            <div class="chip">4 فصول داخل منصة واحدة</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast">—</div>
+
+  <div class="rewardOverlay" id="rewardOverlay" role="dialog" aria-modal="true">
+    <div class="rewardCard">
+      <div class="sparkles" id="sparkles"></div>
+      <div class="rewardMedal" id="rewardIcon">👑</div>
+      <h3 class="rewardTitle" id="rewardTitle">ممتاز!</h3>
+      <p class="rewardText" id="rewardText">—</p>
+      <div class="rewardRow">
+        <button class="ghost" id="rewardClose">إغلاق</button>
+        <button class="ghost" id="rewardRestart">إعادة البدء ↺</button>
+        <button id="rewardNext">الفصل التالي ▶</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* =========================
+   بيانات الفصول (4 صفحات)
+   ========================= */
+const PAGES = [
+  {
+    id: "p1",
+    title: "الطاقة والتغيرات الكيميائية",
+    subtitle: "فرّق بين المفاهيم الحرارية والمصطلحات الأساسية",
+    pairs: [
+      { right: "النظام", left: "الجزء الذي ندرسه من الكون" },
+      { right: "الوسط المحيط", left: "كل ما عدا النظام" },
+      { right: "الحرارة (q)", left: "انتقال طاقة بسبب فرق درجة الحرارة" },
+      { right: "الطاقة الداخلية", left: "طاقة الجسيمات داخل النظام" },
+      { right: "تفاعل طارد للحرارة", left: "يطلق حرارة للوسط (ΔH سالب غالبًا)" },
+      { right: "تفاعل ماص للحرارة", left: "يمتص حرارة من الوسط (ΔH موجب غالبًا)" },
+      { right: "ΔH موجبة", left: "يدل غالبًا على تفاعل ماص" },
+      { right: "ΔH سالبة", left: "يدل غالبًا على تفاعل طارد" },
+      { right: "المعادلة الحرارية", left: "معادلة كيميائية مرفقة بقيمة ΔH" },
+      { right: "المسعر", left: "جهاز لقياس كمية الحرارة المنطلقة/الممتصة" },
+      { right: "قانون هس", left: "ΔH الكلي = مجموع ΔH للخطوات" },
+      { right: "حرارة التكوين", left: "تغير حرارة تكوين 1 مول من مركب" }
+    ]
+  },
+  {
+    id: "p2",
+    title: "سرعة التفاعلات الكيميائية",
+    subtitle: "فرّق بين العوامل، التصادمات، وطاقة التنشيط",
+    pairs: [
+      { right: "سرعة التفاعل", left: "تغير التركيز مع الزمن" },
+      { right: "نظرية التصادم", left: "التفاعل يحدث عند تصادم فعّال" },
+      { right: "تصادم فعّال", left: "طاقة كافية + اتجاه مناسب" },
+      { right: "طاقة التنشيط (Ea)", left: "أقل طاقة لازمة لبدء التفاعل" },
+      { right: "زيادة الحرارة", left: "تزيد التصادمات الفعّالة (طاقة أعلى)" },
+      { right: "زيادة التركيز", left: "تزيد عدد التصادمات" },
+      { right: "زيادة مساحة السطح", left: "سطح تلامس أكبر → تصادمات أكثر" },
+      { right: "المحفز", left: "يخفض Ea بمسار بديل" },
+      { right: "قانون السرعة", left: "علاقة تجريبية بين السرعة والتراكيز" },
+      { right: "رتبة التفاعل", left: "مجموع الأسس في قانون السرعة" },
+      { right: "ثابت السرعة (k)", left: "يتغير بتغير درجة الحرارة" },
+      { right: "الخطوة المحدِّدة للسرعة", left: "أبطأ خطوة تتحكم في السرعة" }
+    ]
+  },
+  {
+    id: "p3",
+    title: "الاتزان الكيميائي",
+    subtitle: "فرّق بين K و Q وتأثير التغيرات على موضع الاتزان",
+    pairs: [
+      { right: "اتزان ديناميكي", left: "سرعة أمامية = سرعة عكسية" },
+      { right: "ثابت الاتزان (K)", left: "يقيس ميل الاتزان عند درجة حرارة معينة" },
+      { right: "حاصل التفاعل (Q)", left: "يقيس الحالة الحالية قبل/أثناء الاتزان" },
+      { right: "Q < K", left: "يتجه النظام لتكوين نواتج أكثر" },
+      { right: "Q > K", left: "يتجه النظام لتكوين متفاعلات أكثر" },
+      { right: "لا تدخل في K", left: "الصلب والسائل النقي" },
+      { right: "زيادة متفاعل", left: "انزياح نحو النواتج" },
+      { right: "زيادة ناتج", left: "انزياح نحو المتفاعلات" },
+      { right: "زيادة الضغط (غازات)", left: "جهة مولات الغاز الأقل" },
+      { right: "المحفز في الاتزان", left: "يسرّع الوصول فقط (لا يغير K)" },
+      { right: "الحرارة في تفاعل ماص", left: "رفع الحرارة يميل للنواتج ويغيّر K" },
+      { right: "الحرارة في تفاعل طارد", left: "رفع الحرارة يميل للمتفاعلات ويغيّر K" }
+    ]
+  },
+  {
+    id: "p4",
+    title: "الكيمياء العضوية",
+    subtitle: "فرّق بين الهيدروكربونات والمجموعات الوظيفية",
+    pairs: [
+      { right: "هيدروكربون", left: "يتكون من C و H فقط" },
+      { right: "ألكان", left: "مشبع (روابط أحادية)" },
+      { right: "ألكين", left: "غير مشبع (رابطة مزدوجة)" },
+      { right: "ألكاين", left: "غير مشبع (رابطة ثلاثية)" },
+      { right: "أروماتي", left: "حلقة بنزين/نظام عطري" },
+      { right: "الإضافة", left: "تفاعل شائع للروابط المتعددة" },
+      { right: "الاستبدال", left: "تفاعل شائع للألكانات/الأروماتيات بشروط" },
+      { right: "البلمرة", left: "تحويل مونومرات إلى بوليمر" },
+      { right: "هاليد ألكيل (R–X)", left: "مشتق عضوي يحتوي هالوجين" },
+      { right: "مجموعة -OH", left: "كحول" },
+      { right: "مجموعة -COOH", left: "حمض كربوكسيلي" },
+      { right: "الأحماض الأمينية", left: "وحدات بناء البروتينات" }
+    ]
+  }
+];
+
+/* =========================
+   حالة عامة
+   ========================= */
+const state = {
+  pageIndex: 0,
+  score: Number(localStorage.getItem("chem_score") || 0),
+  streak: Number(localStorage.getItem("chem_streak") || 0),
+  sound: true,
+  selectedRightKey: null,
+  selectedLeftKey: null,
+  matchedByPage: new Map(),
+  timerByPage: new Map(),
+  lastShownCompletion: new Set(),
+  _grandShown: false
+};
+
+const TIMER_SECONDS = 75; // عدّلي 60/75/90 حسب رغبتك
+
+const el = (id)=>document.getElementById(id);
+
+function save(){
+  localStorage.setItem("chem_score", String(state.score));
+  localStorage.setItem("chem_streak", String(state.streak));
+}
+function updateHeader(){
+  el("score").textContent = state.score;
+  el("streak").textContent = state.streak;
+}
+updateHeader();
+
+/* =========================
+   حقول الهوية (مدرسة/معلمة/مديرة)
+   ========================= */
+const schoolInput = el("schoolName");
+const teacherInput = el("teacherName");
+const principalInput = el("principalName");
+
+schoolInput.value = localStorage.getItem("chem_school") || "";
+teacherInput.value = localStorage.getItem("chem_teacher") || "";
+principalInput.value = localStorage.getItem("chem_principal") || "";
+
+schoolInput.addEventListener("input", ()=> localStorage.setItem("chem_school", schoolInput.value.trim()));
+teacherInput.addEventListener("input", ()=> localStorage.setItem("chem_teacher", teacherInput.value.trim()));
+principalInput.addEventListener("input", ()=> localStorage.setItem("chem_principal", principalInput.value.trim()));
+
+/* =========================
+   تشجيع متنوع
+   ========================= */
+const PRAISE = [
+  "ممتاز! تركيزك واضح ✅",
+  "رائع جدًا! استمري 🌿",
+  "إجابة دقيقة! 👌",
+  "إتقان جميل! ✨",
+  "سريعة وذكية! 🔥",
+  "أحسنتِ! 👏",
+  "شغل علمي مرتب 🧠",
+  "ممتازة! خطوة للأمام ⭐"
+];
+const TRY_AGAIN = [
+  "قريبة! جرّبي مرة ثانية 🌼",
+  "ولا يهمك—راجعي المفهوم بسرعة 🧠",
+  "حلو! الآن اختاري التعريف الأدق ✨",
+  "مو مشكلة—ارجعي للتلميح 👇",
+  "تمام… مفهوم → تعريف ✅"
+];
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+/* =========================
+   Toast
+   ========================= */
+let toastTimer = null;
+function showToast(msg){
+  const t = el("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove("show"), 1800);
+}
+
+/* =========================
+   Reward Overlay + Sparkles
+   ========================= */
+function renderSparkles(){
+  const host = el("sparkles");
+  if(!host) return;
+  host.innerHTML = "";
+  for(let i=0;i<12;i++){
+    const s = document.createElement("i");
+    s.style.top = `${8 + Math.random()*84}%`;
+    s.style.left = `${6 + Math.random()*88}%`;
+    s.style.animationDelay = `${Math.random()*1.6}s`;
+    s.style.width = `${6 + Math.random()*10}px`;
+    s.style.height = s.style.width;
+    host.appendChild(s);
+  }
+}
+function showReward({icon="👑", title="ممتازة!", text=""}={}){
+  el("rewardIcon").textContent = icon;
+  el("rewardTitle").textContent = title;
+  el("rewardText").innerHTML = text;
+  renderSparkles();
+  el("rewardOverlay").classList.add("show");
+}
+function hideReward(){ el("rewardOverlay").classList.remove("show"); }
+
+el("rewardClose").addEventListener("click", hideReward);
+el("rewardOverlay").addEventListener("click", (e)=>{
+  if(e.target.id === "rewardOverlay") hideReward();
+});
+
+/* =========================
+   أصوات WebAudio (بدون ملفات)
+   ========================= */
+let audioCtx = null;
+function ensureAudio(){
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+function beep({freq=660, dur=0.09, type="sine", gain=0.06}={}){
+  if(!state.sound) return;
+  ensureAudio();
+  const t0 = audioCtx.currentTime;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = type;
+  o.frequency.setValueAtTime(freq, t0);
+  g.gain.setValueAtTime(gain, t0);
+  g.gain.exponentialRampToValueAtTime(0.001, t0 + dur);
+  o.connect(g); g.connect(audioCtx.destination);
+  o.start(t0); o.stop(t0 + dur);
+}
+function applause(){
+  if(!state.sound) return;
+  ensureAudio();
+  for(let i=0;i<14;i++){
+    setTimeout(()=>beep({freq: 380+Math.random()*520, dur:0.04, type:"square", gain:0.03}), i*45);
+  }
+}
+function fireworkPop(){
+  if(!state.sound) return;
+  beep({freq: 920, dur:0.05, type:"triangle", gain:0.05});
+  setTimeout(()=>beep({freq: 240, dur:0.12, type:"sawtooth", gain:0.03}), 65);
+}
+function wrongBuzz(){
+  if(!state.sound) return;
+  beep({freq: 210, dur:0.12, type:"sawtooth", gain:0.06});
+  setTimeout(()=>beep({freq: 170, dur:0.10, type:"sawtooth", gain:0.05}), 120);
+}
+function successChime(){
+  if(!state.sound) return;
+  beep({freq: 880, dur:0.07, type:"sine", gain:0.05});
+  setTimeout(()=>beep({freq: 1046, dur:0.08, type:"triangle", gain:0.05}), 90);
+  setTimeout(()=>beep({freq: 1318, dur:0.10, type:"sine", gain:0.05}), 190);
+}
+
+/* =========================
+   Confetti (احتفال)
+   ========================= */
+function celebrate(){
+  const base = { origin:{y:0.75}, ticks:260, spread:90 };
+  confetti({ ...base, particleCount: 120, scalar: 1.05 });
+  setTimeout(()=>confetti({ ...base, particleCount: 80, spread:70, origin:{y:0.78}, scalar: 0.95 }), 160);
+  setTimeout(()=>confetti({ ...base, particleCount: 70, spread:110, origin:{y:0.70}, scalar: 1.10 }), 320);
+  fireworkPop();
+  applause();
+}
+
+/* =========================
+   Timer لكل فصل
+   ========================= */
+function ensureTimer(pageId){
+  if(!state.timerByPage.has(pageId)){
+    state.timerByPage.set(pageId, { remaining: TIMER_SECONDS, intervalId: null, running:false });
+  }
+  return state.timerByPage.get(pageId);
+}
+function formatTime(s){
+  const m = Math.floor(s/60);
+  const r = s%60;
+  return `${m}:${String(r).padStart(2,"0")}`;
+}
+function updateTimerUI(pageId){
+  const t = ensureTimer(pageId);
+  const pill = document.getElementById(`${pageId}_timer`);
+  if(!pill) return;
+  pill.innerHTML = `⏱ الوقت: <b>${formatTime(t.remaining)}</b>`;
+  pill.classList.remove("danger","ok");
+  if(t.remaining <= 15) pill.classList.add("danger");
+  else pill.classList.add("ok");
+}
+function startTimer(pageId){
+  const t = ensureTimer(pageId);
+  if(t.running) return;
+  t.running = true;
+  t.intervalId = setInterval(()=>{
+    if(t.remaining > 0){
+      t.remaining -= 1;
+      updateTimerUI(pageId);
+    }else{
+      stopTimer(pageId);
+      state.streak = 0;
+      save(); updateHeader();
+      showToast("⏱ انتهى الوقت! أعيدي خلط الفصل أو جرّبي من جديد.");
+      wrongBuzz();
+    }
+  }, 1000);
+}
+function stopTimer(pageId){
+  const t = ensureTimer(pageId);
+  if(t.intervalId) clearInterval(t.intervalId);
+  t.intervalId = null;
+  t.running = false;
+}
+function resetTimer(pageId){
+  stopTimer(pageId);
+  const t = ensureTimer(pageId);
+  t.remaining = TIMER_SECONDS;
+  updateTimerUI(pageId);
+}
+function timeBonus(pageId){
+  const t = ensureTimer(pageId);
+  return Math.max(0, Math.min(10, Math.floor(t.remaining / 8)));
+}
+
+/* =========================
+   بناء الصفحات الأربع
+   ========================= */
+const pagesHost = el("pagesHost");
+
+function keyFor(side, idx){ return `${side}:${idx}`; }
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function ensureMatchedSet(pageId){
+  if(!state.matchedByPage.has(pageId)) state.matchedByPage.set(pageId, new Set());
+  return state.matchedByPage.get(pageId);
+}
+
+function renderAllPages(){
+  pagesHost.innerHTML = "";
+  PAGES.forEach((p, idx)=>{
+    const section = document.createElement("section");
+    section.className = "pages";
+    section.id = p.id;
+
+    const rights = shuffle(p.pairs.map(x=>x.right));
+    const lefts  = shuffle(p.pairs.map(x=>x.left));
+    section.dataset.rights = JSON.stringify(rights);
+    section.dataset.lefts  = JSON.stringify(lefts);
+
+    section.innerHTML = `
+      <div class="intro">
+        <div>
+          <h2>${p.title}</h2>
+          <small>${p.subtitle}</small>
+        </div>
+        <div class="progress">
+          <span id="${p.id}_ptext">0/${p.pairs.length}</span>
+          <div class="bar"><i id="${p.id}_pbar"></i></div>
+          <div class="timerPill" id="${p.id}_timer">⏱ الوقت: <b>${formatTime(TIMER_SECONDS)}</b></div>
+          <button class="ghost" id="${p.id}_restart">إعادة خلط</button>
+        </div>
+      </div>
+
+      <div class="board">
+        <div class="col">
+          <h3>التعريفات <span>اضغطي تعريفًا (يسار)</span></h3>
+          <div class="list" id="${p.id}_left"></div>
+        </div>
+        <div class="col">
+          <h3>المفاهيم <span>اضغطي مفهومًا (يمين)</span></h3>
+          <div class="list" id="${p.id}_right"></div>
+        </div>
+      </div>
+
+      <div class="hint" id="${p.id}_hint">ابدئي باختيار مفهوم من اليمين ثم اختاري تعريفه من اليسار.</div>
+      <div class="footerRow">
+        <div class="chips">
+          <div class="chip">Tap-to-Match</div>
+          <div class="chip">فرّق بين المفاهيم</div>
+          <div class="chip">صفحة ${idx+1} من 4</div>
+        </div>
+      </div>
+    `;
+
+    pagesHost.appendChild(section);
+
+    section.querySelector(`#${p.id}_restart`).addEventListener("click", ()=>{
+      state.matchedByPage.set(p.id, new Set());
+      state.lastShownCompletion.delete(p.id);
+      state._grandShown = false;
+
+      section.dataset.rights = JSON.stringify(shuffle(p.pairs.map(x=>x.right)));
+      section.dataset.lefts  = JSON.stringify(shuffle(p.pairs.map(x=>x.left)));
+      state.selectedRightKey = null;
+      state.selectedLeftKey = null;
+
+      resetTimer(p.id);
+      startTimer(p.id);
+
+      renderPage(p.id);
+      showToast("🔄 تم إعادة الخلط! ابدئي بسرعة لجمع بونص الوقت.");
+      beep({freq: 520, dur:0.07, type:"sine", gain:0.05});
+    });
+
+    renderPage(p.id);
+  });
+}
+
+function renderPage(pageId){
+  const page = PAGES.find(x=>x.id===pageId);
+  const section = document.getElementById(pageId);
+  const matched = ensureMatchedSet(pageId);
+
+  const rights = JSON.parse(section.dataset.rights);
+  const lefts  = JSON.parse(section.dataset.lefts);
+
+  const leftHost = section.querySelector(`#${pageId}_left`);
+  const rightHost = section.querySelector(`#${pageId}_right`);
+  const hint = section.querySelector(`#${pageId}_hint`);
+
+  leftHost.innerHTML = "";
+  rightHost.innerHTML = "";
+
+  lefts.forEach((txt, idx)=>{
+    const k = keyFor("L", idx);
+    const div = document.createElement("div");
+    div.className = "item";
+    div.dataset.key = k;
+
+    if(matched.has(k)){
+      div.classList.add("matched");
+      div.innerHTML = `<span>${txt}</span><small>✔ تم</small>`;
+    }else{
+      div.innerHTML = `<span>${txt}</span><small>اختيار</small>`;
+      div.addEventListener("click", ()=> onPick(pageId, "L", idx));
+    }
+    leftHost.appendChild(div);
+  });
+
+  rights.forEach((txt, idx)=>{
+    const k = keyFor("R", idx);
+    const div = document.createElement("div");
+    div.className = "item";
+    div.dataset.key = k;
+
+    if(matched.has(k)){
+      div.classList.add("matched");
+      div.innerHTML = `<span>${txt}</span><small>✔ تم</small>`;
+    }else{
+      div.innerHTML = `<span>${txt}</span><small>اختيار</small>`;
+      div.addEventListener("click", ()=> onPick(pageId, "R", idx));
+    }
+    rightHost.appendChild(div);
+  });
+
+  // التقدم
+  const pairsCount = page.pairs.length;
+  const matchedPairs = Math.floor(matched.size / 2);
+  section.querySelector(`#${pageId}_ptext`).textContent = `${matchedPairs}/${pairsCount}`;
+  section.querySelector(`#${pageId}_pbar`).style.width = `${Math.round((matchedPairs/pairsCount)*100)}%`;
+  updateTimerUI(pageId);
+
+  // تمييز الاختيارات
+  if(state.selectedLeftKey){
+    const n = section.querySelector(`[data-key="${state.selectedLeftKey}"]`);
+    if(n && !n.classList.contains("matched")) n.classList.add("selected");
+  }
+  if(state.selectedRightKey){
+    const n = section.querySelector(`[data-key="${state.selectedRightKey}"]`);
+    if(n && !n.classList.contains("matched")) n.classList.add("selected");
+  }
+
+  if(matchedPairs === pairsCount){
+    hint.textContent = "🎉 أنهيتِ هذا الفصل! يمكنك الانتقال للفصل التالي.";
+    stopTimer(pageId);
+
+    // مكافأة الفصل (مرة واحدة)
+    if(!state.lastShownCompletion.has(pageId)){
+      state.lastShownCompletion.add(pageId);
+
+      const t = ensureTimer(pageId);
+      let icon="🎖️", title="ميدالية إنجاز!", msgExtra="";
+      if(t.remaining >= 45){ icon="👑"; title="تاج التفريق!"; msgExtra="سرعتك ممتازة!"; }
+      else if(t.remaining >= 25){ icon="🏅"; title="وسام ممتاز!"; msgExtra="أداء رائع!"; }
+      else { icon="🎖️"; title="ميدالية إنجاز!"; msgExtra="استمرّي بهذا المستوى!"; }
+
+      const school = localStorage.getItem("chem_school") || "مدرستك";
+      const teacher = localStorage.getItem("chem_teacher") || "المعلمة";
+      const principal = localStorage.getItem("chem_principal") || "مديرة المدرسة";
+
+      showReward({
+        icon,
+        title,
+        text: `
+          <div style="line-height:1.9;">
+            إنجاز جميل في <b>${school}</b> ✨<br>
+            بإشراف <b>${teacher}</b> 🌿<br>
+            وبدعم <b>${principal}</b> 🏫<br>
+            الزمن المتبقي: <b>${formatTime(t.remaining)}</b> — ${msgExtra}
+          </div>
+        `
+      });
+      successChime();
+      confetti({particleCount:180, spread:95, origin:{y:0.72}, ticks:280, scalar:1.05});
+    }
+
+    // كأس نهائي إذا اكتملت كل الفصول
+    if(allChaptersCompleted() && !state._grandShown){
+      state._grandShown = true;
+      setTimeout(showGrandTrophy, 350);
+    }
+  }else{
+    hint.textContent = "اختاري مفهومًا من اليمين ثم التعريف المطابق من اليسار.";
+  }
+}
+
+function findPairIndexByText(page, rightText, leftText){
+  return page.pairs.findIndex(p => p.right === rightText && p.left === leftText);
+}
+
+function onPick(pageId, side, idx){
+  const section = document.getElementById(pageId);
+  const page = PAGES.find(x=>x.id===pageId);
+  const matched = ensureMatchedSet(pageId);
+
+  const key = keyFor(side, idx);
+  if(matched.has(key)) return;
+
+  // أول تفاعل يبدأ الصوت/المؤقت
+  startTimer(pageId);
+
+  if(side === "R") state.selectedRightKey = key;
+  if(side === "L") state.selectedLeftKey  = key;
+
+  beep({freq: side==="R" ? 740 : 620, dur:0.05, type:"sine", gain:0.04});
+  renderPage(pageId);
+
+  if(state.selectedRightKey && state.selectedLeftKey){
+    const rights = JSON.parse(section.dataset.rights);
+    const lefts  = JSON.parse(section.dataset.lefts);
+
+    const rIdx = Number(state.selectedRightKey.split(":")[1]);
+    const lIdx = Number(state.selectedLeftKey.split(":")[1]);
+
+    const rightText = rights[rIdx];
+    const leftText  = lefts[lIdx];
+
+    const isCorrect = findPairIndexByText(page, rightText, leftText) !== -1;
+
+    const rNode = section.querySelector(`[data-key="${state.selectedRightKey}"]`);
+    const lNode = section.querySelector(`[data-key="${state.selectedLeftKey}"]`);
+
+    if(isCorrect){
+      matched.add(state.selectedRightKey);
+      matched.add(state.selectedLeftKey);
+
+      const bonus = timeBonus(pageId);
+      state.score += (10 + bonus);
+      state.streak += 1;
+      save(); updateHeader();
+
+      showToast(`${pick(PRAISE)} (+${bonus} بونص وقت)`);
+      celebrate();
+
+      state.selectedRightKey = null;
+      state.selectedLeftKey = null;
+      renderPage(pageId);
+    }else{
+      state.streak = 0;
+      save(); updateHeader();
+
+      wrongBuzz();
+      showToast(pick(TRY_AGAIN));
+
+      if(rNode) rNode.classList.add("wrong");
+      if(lNode) lNode.classList.add("wrong");
+
+      setTimeout(()=>{
+        state.selectedRightKey = null;
+        state.selectedLeftKey = null;
+        renderPage(pageId);
+      }, 550);
+    }
+  }
+}
+
+/* =========================
+   تنقل الصفحات
+   ========================= */
+function setActivePage(idx){
+  state.pageIndex = Math.max(0, Math.min(PAGES.length-1, idx));
+  const all = [...document.querySelectorAll(".pages")];
+  all.forEach(s => s.classList.remove("active"));
+  const activeId = PAGES[state.pageIndex].id;
+  document.getElementById(activeId).classList.add("active");
+  el("pageCrumb").textContent = `الفصل ${state.pageIndex+1}/4 — ${PAGES[state.pageIndex].title}`;
+
+  resetTimer(activeId);
+  startTimer(activeId);
+
+  beep({freq: 640, dur:0.05, type:"sine", gain:0.04});
+}
+
+el("prevPage").addEventListener("click", ()=> setActivePage(state.pageIndex - 1));
+el("nextPage").addEventListener("click", ()=> setActivePage(state.pageIndex + 1));
+
+el("rewardNext").addEventListener("click", ()=>{
+  hideReward();
+  setActivePage(state.pageIndex + 1);
+});
+
+/* =========================
+   كأس نهائي
+   ========================= */
+function allChaptersCompleted(){
+  return PAGES.every(p=>{
+    const set = state.matchedByPage.get(p.id);
+    return set && (Math.floor(set.size/2) === p.pairs.length);
+  });
+}
+function showGrandTrophy(){
+  const school = localStorage.getItem("chem_school") || "مدرستك";
+  const teacher = localStorage.getItem("chem_teacher") || "المعلمة";
+  const principal = localStorage.getItem("chem_principal") || "مديرة المدرسة";
+
+  confetti({ particleCount: 260, spread: 120, origin: { y: 0.70 }, ticks: 320, scalar: 1.1 });
+  setTimeout(()=>confetti({ particleCount: 180, spread: 100, origin: { y: 0.75 }, ticks: 320, scalar: 1.05 }), 220);
+  setTimeout(()=>confetti({ particleCount: 140, spread: 140, origin: { y: 0.60 }, ticks: 360, scalar: 1.15 }), 520);
+
+  successChime();
+  applause();
+
+  showReward({
+    icon:"🏆",
+    title:"الكأس النهائي — أتممتِ المنصّة!",
+    text: `
+      <div style="margin-top:6px; line-height:1.9; font-weight:950; color:#6b7280">
+        <div style="font-size:15px; margin-bottom:6px;">
+          🎓 <b style="color:#1f2a37">${school}</b>
+        </div>
+        إنجاز رائع بإشراف <b style="color:#1f2a37">${teacher}</b> 🌿
+        وبدعم <b style="color:#1f2a37">${principal}</b> 🏫
+        <br>
+        مجموع نقاطك: <b style="color:#33618C">${state.score}</b> ⭐
+      </div>
+      <div class="trophyRibbon">
+        <span class="tag">👑 تفريق</span>
+        <span class="tag">⏱ سرعة</span>
+        <span class="tag">✨ إتقان</span>
+        <span class="tag">🏅 إنجاز</span>
+      </div>
+    `
+  });
+}
+
+/* =========================
+   أزرار عامة
+   ========================= */
+el("toggleSound").addEventListener("click", (e)=>{
+  state.sound = !state.sound;
+  e.target.textContent = state.sound ? "🔊 الصوت: تشغيل" : "🔇 الصوت: إيقاف";
+  beep({freq: state.sound ? 820 : 240, dur:0.07, type:"sine", gain:0.05});
+});
+
+el("resetAll").addEventListener("click", ()=>{
+  state.score = 0;
+  state.streak = 0;
+  save(); updateHeader();
+
+  state.lastShownCompletion = new Set();
+  state._grandShown = false;
+
+  PAGES.forEach(p=>{
+    state.matchedByPage.set(p.id, new Set());
+    resetTimer(p.id);
+  });
+
+  state.selectedRightKey = null;
+  state.selectedLeftKey = null;
+
+  renderPage(PAGES[state.pageIndex].id);
+  showToast("تمت إعادة الضبط ✅");
+  beep({freq: 300, dur:0.09, type:"triangle", gain:0.05});
+});
+
+el("rewardRestart").addEventListener("click", ()=>{
+  hideReward();
+
+  state.score = 0;
+  state.streak = 0;
+  save(); updateHeader();
+
+  state.lastShownCompletion = new Set();
+  state._grandShown = false;
+
+  PAGES.forEach(p=>{
+    state.matchedByPage.set(p.id, new Set());
+    resetTimer(p.id);
+  });
+
+  state.selectedRightKey = null;
+  state.selectedLeftKey = null;
+
+  setActivePage(0);
+  renderPage(PAGES[0].id);
+
+  showToast("✨ بدأنا من جديد! بالتوفيق");
+});
+
+/* =========================
+   تشغيل أولي
+   ========================= */
+renderAllPages();
+setActivePage(0);
+</script>
+</body>
+</html>
